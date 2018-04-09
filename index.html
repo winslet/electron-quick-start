@@ -1,19 +1,63 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="./styles.min.css" media="screen" charset="utf-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <script src="./gui-funct.js"></script>
+    <title>Fabric Installation</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+    <div class="content">
+      <h1>Fabric Installation</h1>
+        <h2>Instances Running</h2>
+        <hr>
+        <div class="fabric-button-icons">
+          <p>Fabric Instance</p>
+          <button class="icon" title="Start Fabric" onclick="startFabric()"><i class="material-icons md-18">play_arrow</i></button>
+          <button class="icon" title="Stop Fabric" onclick="stopFabric()"><i class="material-icons md-18">stop</i></button>
+          <button class="icon" title="Teardown Fabric" onclick="teardownFabric()"><i class="material-icons md-18">delete</i></button>
+        </div>
+
+        <div class="fabric-button-icons">
+          <p>Docker</p>
+          <button class="icon" title="Teardown Docker containers" onclick="teardownAllDocker()"><i class="material-icons md-18">delete_forever</i></button>
+        </div>
+
+
+        <div class="fabric-button-icons">
+          <p>Hyperledger Composer</p>
+          <button class="icon" title="Create peer admin card" onclick="createPeerAdminCard()"><i class="material-icons md-18">person_add</i></button>
+          <button class="icon" title="Create Composer profile" onclick="createComposerProfile()"><i class="material-icons md-18">folder_shared</i></button>
+        </div>
+
+        <!-- <p>REST API</p> -->
+        <hr>
+        <!-- <p>Quit</p> -->
+
+        <h2>Logs</h2>
+        <textarea rows="20" cols="40" id="droid-output" disabled="true"></textarea>
+       <p id="status"></p>
+
+    </div>
+      <!-- <footer>
+        <button class="bottom">Launch Composer</button>
+      </footer> -->
 
     <script>
       // You can also require other files to run in this process
       require('./renderer.js')
     </script>
+
+
+    <script>
+        // GLUE to the screen
+        function getDroidOutput() { return document.getElementById("droid-output");  };
+        function getStatus()      { return document.getElementById("status");  };
+        // End of GLUE
+        // backgroundProcess();
+    </script>
+
+
   </body>
 </html>

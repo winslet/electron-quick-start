@@ -1,60 +1,87 @@
-const electron = require('electron')
-// Module to control application life.
-const app = electron.app
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
-
+// Sets variables (const)
+const {app, BrowserWindow, ipcMain, Tray} = require('electron')
 const path = require('path')
-const url = require('url')
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+const assetsDirectory = path.join(__dirname, 'img')
 
-function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+let tray = undefined
+let window = undefined
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+// Don't show the app in the doc
+app.dock.hide()
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+// Creates tray & window
+app.on('ready', () => {
+  createTray()
+  createWindow()
+})
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
+// Quit the app when the window is closed
+app.on('window-all-closed', () => {
+  app.quit()
+})
+
+// Creates tray image & toggles window on click
+const createTray = () => {
+  tray = new Tray(path.join(assetsDirectory, 'icon.png'))
+  tray.on('click', function (event) {
+    toggleWindow()
   })
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+  const getWindowPosition = () => {
+  const windowBounds = window.getBounds()
+  const trayBounds = tray.getBounds()
 
-// Quit when all windows are closed.
-app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
+  // Center window horizontally below the tray icon
+  const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
+
+  // Position window 4 pixels vertically below the tray icon
+  const y = Math.round(trayBounds.y + trayBounds.height + 3)
+
+  return {x: x, y: y}
+}
+
+// Creates window & specifies its values
+const createWindow = () => {
+  window = new BrowserWindow({
+        width: 300,
+        height: 500,
+        // width: 500,
+        // height: 800,
+        show: false,
+        frame: false,
+        fullscreenable: false,
+        resizable: false,
+        transparent: true,
+        'node-integration': false
+    })
+    // This is where the index.html file is loaded into the window
+    window.loadURL('file://' + __dirname + '/index.html');
+
+  // Hide the window when it loses focus
+  window.on('blur', () => {
+    if (!window.webContents.isDevToolsOpened()) {
+      window.hide()
+    }
+  })
+}
+
+const toggleWindow = () => {
+  if (window.isVisible()) {
+    window.hide()
+  } else {
+    showWindow()
   }
-})
+}
 
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
+const showWindow = () => {
+  const position = getWindowPosition()
+  window.setPosition(position.x, position.y, false)
+  window.show()
+  window.focus()
+}
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+ipcMain.on('show-window', () => {
+  showWindow()
+})
