@@ -8,7 +8,7 @@ function startFabric() {
     var ls = process.spawn('./fabric-tools/startFabric.sh');
 
     ls.stdout.on('data', function (data) {
-      // console.log('stdout: <' + data+'> ');
+      console.log('stdout: <' + data+'> ');
           // appendToDroidOutput(data);
       appendToDroidOutput('' + data+'\n');
     });
